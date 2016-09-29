@@ -1,7 +1,7 @@
 
 # Short description of the practical
 
-P12	Data handling and visual exploration of the processed and scored data from P3 / P9
+P12	Data handling and visual exploration of the processed and scored data from P10
 (ATC, Flex Lab B)
 
 
@@ -10,39 +10,37 @@ Staff: Andrzej Oles, Mike Smith, Bernd Klaus
 Work:
 1. Importing the data into R, the concept of "tidy data", introduction 
 to data handling strategies 
-2. Visual exploration of data using quality-control related plots, e.g. heatmaps,
+2. Visual exploration of data using quality control related plots, e.g. heatmaps
 and PCA plots
 
 
 
 
-# Short description of the practical
+# Detailed description of the practical
 
 
 High-throughput microscopy screens with technologies such as RNAi, CRISPR-Cas
-and libraries of drug compounds typically generate large quantities of data that
+and libraries of drug compounds generate large amounts of data that
 are potentially rich in biological information. Typically thousands of gene or
 drug targets are screened and tens or even hundreds of image features are
-extracted. Exploring these large datasets is challenging. R packages from
-the "tidyverse" will lead the way here.
+extracted. Finding patterns indicative of exciting biology within these large
+datasets and prioritizing lists of candidate hits for further experimental
+testing is challenging, even after rigorous quality control steps and correction
+for technical biases have been performed.
 
-
-In the tutorial we will fist introduce the concept of "tidy data" that provides
-a practically useful way of organizing big experimental datasets
-and show how turning the initial data in to a "tidy" representation.
-
+In this tutorial we will first introduce the concept of "tidy data", which provides
+a practically useful way of organizing big datasets,
+and show how to turn the initial data into a "tidy" representation.
 We will then demonstrate how to perform large-scale visualization of the screen 
-results and show how to use this to explore patterns in the data. 
-
-Methods such as Principal component analysis (PCA)  and clustering will be
-employed and the participants will be introduced to the advanced graphical 
+results, and how to apply this to explore patterns in the data. 
+Methods such as principal component analysis (PCA) and clustering will be
+employed, and the participants will be introduced to the advanced graphical 
 capabilities of R.
 
-We will work on the cell-classification results from labs P3 / P9, so this 
-this lab will lead the way to hit calling
-strategies and comprehensive downstream analyses.
-
-We will perform all analyses using open source R/Bioconductor software. 
+We will work on the cell classification results from practical P10, so this 
+tutorial will lead the way to hit calling
+strategies and comprehensive downstream analysis.
+All analyses will be performed in open source R/Bioconductor software. 
 
 
 Software:
