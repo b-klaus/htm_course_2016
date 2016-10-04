@@ -1,17 +1,16 @@
 
 # Short description of the practical
 
-P12	Data handling and visual exploration of the processed and scored data from P10
+P12	Data handling and visual exploration
 (ATC, Flex Lab B)
 
 
 Staff: Andrzej Oles, Mike Smith, Bernd Klaus
 
 Work:
-1. Importing the data into R, the concept of "tidy data", introduction 
-to data handling strategies 
-2. Visual exploration of data using quality control related plots, e.g. heatmaps
-and PCA plots
+Using the processed and scored data from P10, you will learn how to
+1. import the data into R, apply the concepts of "tidy data", use different data handling strategies 
+2. visually explore the data using quality control related plots, incl. heatmaps and PCA plots
 
 
 
@@ -31,13 +30,13 @@ for technical biases have been performed.
 In this tutorial we will first introduce the concept of "tidy data", which provides
 a practically useful way of organizing big datasets,
 and show how to turn the initial data into a "tidy" representation.
-We will then demonstrate how to perform large-scale visualization of the screen 
-results, and how to apply this to explore patterns in the data. 
+You will learn how to make informative large-scale visualizations of the screen 
+results, and how to apply these to explore patterns in the data. 
 Methods such as principal component analysis (PCA) and clustering will be
-employed, and the participants will be introduced to the advanced graphical 
+employed, and you will be introduced to the advanced graphical 
 capabilities of R.
 
-We will work on the cell classification results from practical P10, so this 
+You will work on the cell classification results from practical P10, so this 
 tutorial will lead the way to hit calling
 strategies and comprehensive downstream analysis.
 All analyses will be performed in open source R/Bioconductor software. 
