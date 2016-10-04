@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Bernd Klaus, Andrzej Oles, Mike Smith" />
+
+
+<title>Visual Exploration of High–Throughput–Microscopy Data</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css;charset=utf-8,body%2C%20td%20%7B%0Afont%2Dfamily%3A%20sans%2Dserif%3B%0Abackground%2Dcolor%3A%20white%3B%0Afont%2Dsize%3A%2013px%3B%0A%7D%0Abody%20%7B%0Amax%2Dwidth%3A%20800px%3B%0Amargin%3A%200%20auto%3B%0Apadding%3A%201em%201em%202em%3B%0Aline%2Dheight%3A%2020px%3B%0A%7D%0A%0Adiv%23TOC%20li%20%7B%0Alist%2Dstyle%3Anone%3B%0Abackground%2Dimage%3Anone%3B%0Abackground%2Drepeat%3Anone%3B%0Abackground%2Dposition%3A0%3B%0A%7D%0A%0Ap%2C%20pre%20%7B%20margin%3A%200em%200em%201em%3B%0A%7D%0A%0Aimg%2C%20table%20%7B%0Amargin%3A%200em%20auto%201em%3B%0A%7D%0Ap%20%7B%0Atext%2Dalign%3A%20justify%3B%0A%7D%0Att%2C%20code%2C%20pre%20%7B%0Afont%2Dfamily%3A%20%27DejaVu%20Sans%20Mono%27%2C%20%27Droid%20Sans%20Mono%27%2C%20%27Lucida%20Console%27%2C%20Consolas%2C%20Monaco%2C%20monospace%3B%0A%7D%0Ah1%2C%20h2%2C%20h3%2C%20h4%2C%20h5%2C%20h6%20%7B%20font%2Dfamily%3A%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Amargin%3A%201%2E2em%200em%200%2E6em%200em%3B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Ah1%2Etitle%20%7B%0Afont%2Dsize%3A%20250%25%3B%0Afont%2Dweight%3A%20normal%3B%0Acolor%3A%20%2387b13f%3B%0Aline%2Dheight%3A%201%2E1em%3B%0Amargin%2Dtop%3A%200px%3B%0Aborder%2Dbottom%3A%200px%3B%0A%7D%0Ah1%20%7B%0Afont%2Dsize%3A%20160%25%3B%0Afont%2Dweight%3A%20normal%3B%0Aline%2Dheight%3A%201%2E4em%3B%0Aborder%2Dbottom%3A%201px%20%231a81c2%20solid%3B%0A%7D%0Ah2%20%7B%0Afont%2Dsize%3A%20130%25%3B%20%7D%0Ah1%2C%20h2%2C%20h3%20%7B%0Acolor%3A%20%231a81c2%3B%0A%7D%0Ah3%2C%20h4%2C%20h5%2C%20h6%20%7B%0Afont%2Dsize%3A115%25%3B%0A%7D%20%0A%0Aa%20%7B%20color%3A%20%231a81c2%3B%20%7D%0Aa%3Aactive%20%7B%20outline%3A%20none%3B%20%7D%0Aa%3Avisited%20%7B%20color%3A%20%231a81c2%3B%20%7D%0Aa%3Ahover%20%7B%20color%3A%20%234c94c2%3B%20%7D%0Apre%2C%20img%20%7B%0Amax%2Dwidth%3A%20100%25%3B%0Adisplay%3A%20block%3B%0A%7D%0Apre%20%7B%0Aborder%3A%200px%20none%3B%0Abackground%2Dcolor%3A%20%23F8F8F8%3B%0Awhite%2Dspace%3A%20pre%3B%0Aoverflow%2Dx%3A%20auto%3B%0A%7D%0Apre%20code%20%7B%0Aborder%3A%201px%20%23aaa%20dashed%3B%0Abackground%2Dcolor%3A%20white%3B%0Adisplay%3A%20block%3B%0Apadding%3A%201em%3B%20color%3A%20%23111%3B%0Aoverflow%2Dx%3A%20inherit%3B%0A%7D%0A%0Apre%20code%5Bclass%5D%20%7B%0Abackground%2Dcolor%3A%20inherit%3B%0A%7D%0A%0Apre%5Bclass%5D%20code%20%7B%0Abackground%2Dcolor%3A%20inherit%3B%0A%7D%0A%0Acode%20%7B%20background%2Dcolor%3A%20transparent%3B%0Acolor%3A%20%2387b13f%3B%0Afont%2Dsize%3A%2092%25%3B%0A%7D%0A%0Atable%2C%20td%2C%20th%20%7B%0Aborder%3A%20none%3B%0Apadding%3A%200%200%2E5em%3B%0A%7D%0A%0Atbody%20tr%3Anth%2Dchild%28odd%29%20td%20%7B%0Abackground%2Dcolor%3A%20%23F8F8F8%3B%0A%7D%0Ablockquote%20%7B%0Acolor%3A%23666666%3B%0Amargin%3A0%3B%0Apadding%2Dleft%3A%201em%3B%0Aborder%2Dleft%3A%200%2E5em%20%23EEE%20solid%3B%0A%7D%0Ahr%20%7B%0Aheight%3A%200px%3B%0Aborder%2Dbottom%3A%20none%3B%0Aborder%2Dtop%2Dwidth%3A%20thin%3B%0Aborder%2Dtop%2Dstyle%3A%20dotted%3B%0Aborder%2Dtop%2Dcolor%3A%20%23999999%3B%0A%7D%0Aspan%2Eheader%2Dsection%2Dnumber%20%7B%0Apadding%2Dright%3A%201em%3B%0A%7D%0Aspan%2Etoc%2Dsection%2Dnumber%3A%3Aafter%20%7B%0Acontent%3A%20%22%20%22%3B%0Awhite%2Dspace%3A%20pre%3B%0A%7D%0A%40media%20print%20%7B%0A%2A%20%7B%0Abackground%3A%20transparent%20%21important%3B%0Acolor%3A%20black%20%21important%3B%0Afilter%3Anone%20%21important%3B%0A%2Dms%2Dfilter%3A%20none%20%21important%3B%0A%7D%0Abody%20%7B%0Afont%2Dsize%3A12pt%3B%0Amax%2Dwidth%3A100%25%3B%0A%7D%0Aa%2C%20a%3Avisited%20%7B%0Atext%2Ddecoration%3A%20underline%3B%0A%7D%0Ahr%20%7B%0Avisibility%3A%20hidden%3B%0Apage%2Dbreak%2Dbefore%3A%20always%3B%0A%7D%0Apre%2C%20blockquote%20%7B%0Apadding%2Dright%3A%201em%3B%0Apage%2Dbreak%2Dinside%3A%20avoid%3B%0A%7D%0Atr%2C%20img%20%7B%0Apage%2Dbreak%2Dinside%3A%20avoid%3B%0A%7D%0Aimg%20%7B%0Amax%2Dwidth%3A%20100%25%20%21important%3B%0A%7D%0A%40page%20%3Aleft%20%7B%0Amargin%3A%2015mm%2020mm%2015mm%2010mm%3B%0A%7D%0A%40page%20%3Aright%20%7B%0Amargin%3A%2015mm%2010mm%2015mm%2020mm%3B%0A%7D%0Ap%2C%20h2%2C%20h3%20%7B%0Aorphans%3A%203%3B%20widows%3A%203%3B%0A%7D%0Ah2%2C%20h3%20%7B%0Apage%2Dbreak%2Dafter%3A%20avoid%3B%0A%7D%0A%7D%0A" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+  var links = document.links;  
+  for (var i = 0, linksLength = links.length; i < linksLength; i++)
+    if(links[i].hostname != window.location.hostname)
+      links[i].target = '_blank';
+});
+</script>
+
+</head>
+
+<body>
+
+
+<div id="header">
+<h1 class="title">Visual Exploration of High–Throughput–Microscopy Data</h1>
+<h4 class="author"><em>Bernd Klaus, Andrzej Oles, Mike Smith</em></h4>
+<h4 class="date"><em>4 Oktober 2016</em></h4>
+</div>
+
+<h1>Contents</h1>
+<div id="TOC">
+<ul>
+<li><a href="#required-packages-and-other-preparations"><span class="toc-section-number">1</span> Required packages and other preparations</a></li>
+<li><a href="#importing-the-raw-data"><span class="toc-section-number">2</span> Importing the raw data</a></li>
+<li><a href="#compute-score"><span class="toc-section-number">3</span> Compute score</a></li>
+<li><a href="#the-concept-of-tidy-data"><span class="toc-section-number">4</span> The concept of tidy data</a></li>
+<li><a href="#reshaping-the-screen-data"><span class="toc-section-number">5</span> Reshaping the screen data</a></li>
+<li><a href="#pca-plots-and-cluster-analysis"><span class="toc-section-number">6</span> PCA plots and cluster analysis</a><ul>
+<li><a href="#plotting-in-r-ggplot2"><span class="toc-section-number">6.1</span> Plotting in R: ggplot2</a></li>
+<li><a href="#creating-the-pca-plot"><span class="toc-section-number">6.2</span> Creating the PCA plot</a></li>
+<li><a href="#other-clustering-methods-changing-the-ggplot2-plot"><span class="toc-section-number">6.3</span> Other clustering methods, changing the ggplot2 plot</a></li>
+</ul></li>
+</ul>
+</div>
+
+<!--
+To compile this document
+graphics.off();rm(list=ls());rmarkdown::render('Tutorial_Proteomics.Rmd');purl('Tutorial_Proteomics.Rmd')
+pdf document
+rmarkdown::render('Tutorial_Proteomics.Rmd', BiocStyle::pdf_document())
+-->
+<div id="required-packages-and-other-preparations" class="section level1">
+<h1><span class="header-section-number">1</span> Required packages and other preparations</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rmarkdown)</code></pre></div>
+<pre><code>   
+   Attaching package: 'rmarkdown'</code></pre>
+<pre><code>   The following objects are masked from 'package:BiocStyle':
+   
+       html_document, md_document, pdf_document</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)</code></pre></div>
+<pre><code>   Loading tidyverse: ggplot2
+   Loading tidyverse: tibble
+   Loading tidyverse: tidyr
+   Loading tidyverse: readr
+   Loading tidyverse: purrr
+   Loading tidyverse: dplyr</code></pre>
+<pre><code>   Conflicts with tidy packages ---------------------------------------------------</code></pre>
+<pre><code>   filter(): dplyr, stats
+   lag():    dplyr, stats</code></pre>
+</div>
+<div id="importing-the-raw-data" class="section level1">
+<h1><span class="header-section-number">2</span> Importing the raw data</h1>
+<ul>
+<li>importing using <em><a href="http://bioconductor.org/packages/rhdf5">rhdf5</a></em></li>
+<li>possibly discuss the hdf5 format</li>
+</ul>
+</div>
+<div id="compute-score" class="section level1">
+<h1><span class="header-section-number">3</span> Compute score</h1>
+<ul>
+<li>discuss score computation from phenotype classification results</li>
+</ul>
+</div>
+<div id="the-concept-of-tidy-data" class="section level1">
+<h1><span class="header-section-number">4</span> The concept of tidy data</h1>
+<p>A lot of analysis time is spent on the process of cleaning and preparing the data. Data preparation is not just a first step, but must be repeated many over the course of analysis as new problems come to light or new data is collected. An often neglected, but important aspect of data cleaning is data tidying: structuring datasets to facilitate analysis.</p>
+<p>This “data tidying” includes the ability to move data between different different shapes.</p>
+<p>In a nutshell, a dataset is a collection of values, usually either numbers (if quantitative) or strings (if qualitative). Values are organized in two ways. Every value belongs to a variable and an observation. A variable contains all values that measure the same underlying attribute (like height, temperature, duration) across units.</p>
+<p>An observation contains all values measured on the same unit (like a person, or a day, or a race) across attributes.</p>
+<p>A tidy data frame now organizes the data in such a way that each observation corresponds to an single line in the data set. This is in general the most appropriate format for downstream analysis, although it might not be the most appropriate form for viewing the data.</p>
+<p>For a thorough discussion of this topic see the paper by <a href="\href%7Bhttp://www.jstatsoft.org/v59/i10/paper">Hadley Wickham - tidy data</a>.</p>
+</div>
+<div id="reshaping-the-screen-data" class="section level1">
+<h1><span class="header-section-number">5</span> Reshaping the screen data</h1>
+</div>
+<div id="pca-plots-and-cluster-analysis" class="section level1">
+<h1><span class="header-section-number">6</span> PCA plots and cluster analysis</h1>
+<div id="plotting-in-r-ggplot2" class="section level2">
+<h2><span class="header-section-number">6.1</span> Plotting in R: ggplot2</h2>
+</div>
+<div id="creating-the-pca-plot" class="section level2">
+<h2><span class="header-section-number">6.2</span> Creating the PCA plot</h2>
+</div>
+<div id="other-clustering-methods-changing-the-ggplot2-plot" class="section level2">
+<h2><span class="header-section-number">6.3</span> Other clustering methods, changing the ggplot2 plot</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
+<pre><code>   R version 3.3.1 (2016-06-21)
+   Platform: x86_64-pc-linux-gnu (64-bit)
+   Running under: Ubuntu 14.04.5 LTS
+   
+   locale:
+    [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+    [3] LC_TIME=de_DE.UTF-8        LC_COLLATE=en_US.UTF-8    
+    [5] LC_MONETARY=de_DE.UTF-8    LC_MESSAGES=en_US.UTF-8   
+    [7] LC_PAPER=de_DE.UTF-8       LC_NAME=C                 
+    [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+   [11] LC_MEASUREMENT=de_DE.UTF-8 LC_IDENTIFICATION=C       
+   
+   attached base packages:
+   [1] stats     graphics  grDevices utils     datasets  methods   base     
+   
+   other attached packages:
+    [1] dplyr_0.5.0        purrr_0.2.2        readr_1.0.0        tidyr_0.6.0       
+    [5] tibble_1.2         ggplot2_2.1.0      tidyverse_1.0.0    rmarkdown_1.0.9014
+    [9] knitr_1.14         BiocStyle_2.0.3   
+   
+   loaded via a namespace (and not attached):
+    [1] Rcpp_0.12.7      magrittr_1.5     munsell_0.4.3    colorspace_1.2-6
+    [5] R6_2.1.3         stringr_1.1.0    plyr_1.8.4       tools_3.3.1     
+    [9] grid_3.3.1       gtable_0.2.0     DBI_0.5-1        htmltools_0.3.5 
+   [13] yaml_2.1.13      assertthat_0.1   digest_0.6.10    formatR_1.4     
+   [17] codetools_0.2-14 evaluate_0.9     stringi_1.1.2    scales_0.4.0</code></pre>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
