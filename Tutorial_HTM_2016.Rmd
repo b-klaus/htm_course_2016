@@ -33,6 +33,9 @@ cache = TRUE)
 
 # Required packages and other preparations
 
+```{r get-patched-cellh5R, include=FALSE}
+devtools::install_github("aoles/cellh5-R")
+```
 
 ```{r required packages and data, echo = TRUE}
 library(rmarkdown)
@@ -41,6 +44,8 @@ library(openxlsx)
 library(cellh5)
 library(psych)
 ```
+
+
 
 # Annotation import
 
