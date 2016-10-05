@@ -37,6 +37,17 @@ cache = TRUE)
 ```{r required packages and data, echo = TRUE}
 library(rmarkdown)
 library(tidyverse)
+library(openxlsx)
+library(cellh5)
+library(psych)
+```
+
+# Annotation import
+
+```{r}
+data_path <- "~/p12_data"
+plate_map <- read.xlsx(xlsxFile = file.path(data_path, "plate_mapping.xlsx"))
+head(plate_map)
 ```
 
 
@@ -45,8 +56,49 @@ library(tidyverse)
 * importing using `r Biocpkg("rhdf5")`
 * possibly discuss the hdf5 format
 
+```{r c5readDefine, echo=FALSE, include=FALSE}
+c5read <- function(position, name, index=NULL,
+                    start=NULL, stride=NULL, block=NULL, count=NULL,
+                    compoundAsDataFrame = TRUE, callGeneric = TRUE,
+                    read.attributes = TRUE) {
+  
+  if (H5Lexists(position, name)){
+    ret <- h5read(position, name, index=index,
+                  start=start, stride=stride, block=block, count=count,
+                  compoundAsDataFrame=compoundAsDataFrame, callGeneric=callGeneric,
+                  read.attributes=read.attributes)
+  } else {
+    show(position)
+    stop(sprintf("No subgroup %s in HDF5 group", name))
+  }
+  return(ret)
+}
+```
+
+```{r readingCellH5}
+c5f <- CellH5("/mnt/data/Courseplate2012_Cube4_002/hdf5/_all_positions.ch5")
+c5_pos <- C5Positions(c5f, C5Plates(c5f))
+
+
+predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary3", as = "name")
+
+c5_pos[["WB08_P1"]] <- NULL
+
+```
+
 
 # Compute score
+
+```{r}
+
+test <- sapply(c5_pos, function(pos){
+                predictions <- C5Predictions(c5f, pos, mask = "primary__primary3", as = "name")
+                table(predictions)}
+               )                     
+
+
+```
+
 
 * discuss score computation from phenotype classification results
 
@@ -83,7 +135,65 @@ For a thorough discussion of this topic see the paper by
 
 # Reshaping the screen data
 
-# PCA plots and cluster analysis
+* [regex tutorial](http://www.zytrax.com/tech/web/regex.htm)
+
+
+```{r}
+
+
+test <- rownames_to_column(as.data.frame(test), var = "class")
+
+tidy_test <- gather(test, key = "well", value = "count", WA01_P1:WC07_P1)
+
+
+
+tidy_test$well <- str_replace(tidy_test$well, "^W([A-H][0-9]{2})_P1", "\\1_01")
+
+#join annotation
+
+input_data <- left_join(tidy_test, plate_map, by = c("well" = "Position"))
+
+
+```
+
+.;.
+```{r}
+
+no_cells_per_well <- input_data %>%
+                    group_by(well) %>%
+                    summarize(no_cells = sum(count))
+
+data_with_sums <-  left_join(input_data, no_cells_per_well)
+
+# size_factors <- no_cells_per_well$no_cells /  geometric.mean(no_cells_per_well$no_cells)          
+
+data_for_PCA <- mutate(data_with_sums, perc = count / no_cells, 
+                       z_score = logit(perc))
+
+data_for_PCA <- data_for_PCA %>% 
+                select(class, well, z_score) %>%
+                spread(key = class, value = z_score)
+
+PCA <- prcomp(data_for_PCA[, -1], center = TRUE, scale. = TRUE)
+
+
+genes <- input_data %>%
+         group_by(well) %>%
+         summarize(gene = unique(Gene.Symbol))
+
+genes <- ifelse(is.na(genes$gene), "empty", genes$gene)
+
+dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
+                    PC3 = PCA$x[,3], PC4 = PCA$x[,4],
+                    genes)
+(qplot(PC1, PC2, data = dataGG, color =  genes, geom = "text",
+       label = genes, asp = 1,
+       main = "PC1 vs PC2, top variable genes", size = I(6))
+)
+
+```
+
+
 
 ## Plotting in R: ggplot2
 
