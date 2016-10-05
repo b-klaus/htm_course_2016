@@ -33,7 +33,7 @@ cache = TRUE)
 
 # Required packages and other preparations
 
-```{r get-patched-cellh5R, include=FALSE}
+```{r get-patched-cellh5, include=FALSE}
 devtools::install_github("aoles/cellh5-R")
 ```
 
@@ -44,8 +44,6 @@ library(openxlsx)
 library(cellh5)
 library(psych)
 ```
-
-
 
 # Annotation import
 
@@ -61,27 +59,9 @@ head(plate_map)
 * importing using `r Biocpkg("rhdf5")`
 * possibly discuss the hdf5 format
 
-```{r c5readDefine, echo=FALSE, include=FALSE}
-c5read <- function(position, name, index=NULL,
-                    start=NULL, stride=NULL, block=NULL, count=NULL,
-                    compoundAsDataFrame = TRUE, callGeneric = TRUE,
-                    read.attributes = TRUE) {
-  
-  if (H5Lexists(position, name)){
-    ret <- h5read(position, name, index=index,
-                  start=start, stride=stride, block=block, count=count,
-                  compoundAsDataFrame=compoundAsDataFrame, callGeneric=callGeneric,
-                  read.attributes=read.attributes)
-  } else {
-    show(position)
-    stop(sprintf("No subgroup %s in HDF5 group", name))
-  }
-  return(ret)
-}
-```
-
 ```{r readingCellH5}
-c5f <- CellH5("/mnt/data/Courseplate2012_Cube4_002/hdf5/_all_positions.ch5")
+path <- file.path(data_path, "_all_positions.ch5")
+c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
 
 
