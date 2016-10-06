@@ -33,8 +33,10 @@ cache = TRUE)
 
 # Required packages and other preparations
 
-```{r get-patched-cellh5, include=FALSE}
-devtools::install_github("aoles/cellh5-R")
+```{r get-patched-cellh5, eval=FALSE, include=FALSE}
+## this code chunk is disabled from running and displaying
+## run in case you need to install/update the 'cellh5' package
+devtools::install_github("CellH5/cellh5-R")
 ```
 
 ```{r required packages and data, echo = TRUE}
