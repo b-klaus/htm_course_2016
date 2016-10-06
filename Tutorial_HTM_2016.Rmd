@@ -16,9 +16,9 @@ output:
 
 <!--
 To compile this document
-graphics.off();rm(list=ls());rmarkdown::render('Tutorial_Proteomics.Rmd');purl('Tutorial_Proteomics.Rmd')
+graphics.off();rm(list=ls());rmarkdown::render('Tutorial_HTM_2016.Rmd');purl('Tutorial_HTM_2016.Rmd')
 pdf document
-rmarkdown::render('Tutorial_Proteomics.Rmd', BiocStyle::pdf_document())
+rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
 -->
 
 ```{r options, include=FALSE}
@@ -43,6 +43,8 @@ library(tidyverse)
 library(openxlsx)
 library(cellh5)
 library(psych)
+library(stringr)
+library(splots)
 ```
 
 # Annotation import
@@ -59,12 +61,10 @@ head(plate_map)
 * importing using `r Biocpkg("rhdf5")`
 * possibly discuss the hdf5 format
 
-```{r readingCellH5}
+```{r readingCellH5, eval=FALSE}
 path <- file.path(data_path, "_all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
-
-
 predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary3", as = "name")
 
 c5_pos[["WB08_P1"]] <- NULL
@@ -72,15 +72,15 @@ c5_pos[["WB08_P1"]] <- NULL
 ```
 
 
-# Compute score
+# Extract raw data
 
-```{r}
+```{r, eval=FALSE}
 
-test <- sapply(c5_pos, function(pos){
+raw_data <- sapply(c5_pos, function(pos){
                 predictions <- C5Predictions(c5f, pos, mask = "primary__primary3", as = "name")
                 table(predictions)}
                )                     
-
+save(raw_data, file = "raw_data.RData")
 
 ```
 
@@ -124,24 +124,24 @@ For a thorough discussion of this topic see the paper by
 
 
 ```{r}
+load("raw_data.RData")
 
+tidy_raw_data  <- rownames_to_column(as.data.frame(raw_data), var = "class") %>%
+                   gather(key = "well", value = "count", WA01_P1:WC07_P1)
 
-test <- rownames_to_column(as.data.frame(test), var = "class")
-
-tidy_test <- gather(test, key = "well", value = "count", WA01_P1:WC07_P1)
-
-
-
-tidy_test$well <- str_replace(tidy_test$well, "^W([A-H][0-9]{2})_P1", "\\1_01")
+tidy_raw_data$well <- str_replace(tidy_raw_data$well, "^W([A-H][0-9]{2})_P1", "\\1_01")
 
 #join annotation
 
-input_data <- left_join(tidy_test, plate_map, by = c("well" = "Position"))
+input_data <- left_join(tidy_raw_data, plate_map, by = c("well" = "Position"))
 
 
 ```
 
-.;.
+## Plotting in R: ggplot2
+
+## Creating the PCA plot
+
 ```{r}
 
 no_cells_per_well <- input_data %>%
@@ -179,10 +179,20 @@ dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
 ```
 
 
+# Heatmap of apoptosis z--scores
 
-## Plotting in R: ggplot2
+```{r heatmap_apoptosis}
+dat_rows = toupper(letters[1:8])
+dat_cols = c(paste0("0",seq(1:9)),seq(10,12))
+wells <- data.frame( well = paste0(outer(dat_rows, dat_cols, paste0), "_01"))
+full_data <- arrange(full_join(data_for_PCA, wells), well)
 
-## Creating the PCA plot
+plotScreen(list(logistic (full_data$Apoptosis)), ncol = 1, nx = 12, ny = 8, 
+           main = "Apoptosis percentages",
+           do.names = FALSE, legend.label = "percentage of apoptotic cells ", zrange = c(0,.4) )
+
+```
+
 
 ## Other clustering methods, changing the ggplot2 plot
 
