@@ -2,6 +2,7 @@
 title: "Visual Exploration of High--Throughput--Microscopy Data"
 author: "Bernd Klaus, Andrzej Oles, Mike Smith"
 date: "`r doc_date()`"
+bibliography: HTM_2016.bib
 output: 
     BiocStyle::html_document:
         toc: true
@@ -39,7 +40,7 @@ cache = TRUE)
 devtools::install_github("CellH5/cellh5-R")
 ```
 
-```{r required packages and data, echo = TRUE}
+```{r required packages and data, echo = TRUE, message=FALSE}
 library(rmarkdown)
 library(tidyverse)
 library(openxlsx)
@@ -48,6 +49,16 @@ library(psych)
 library(stringr)
 library(splots)
 ```
+
+# About the tutorial
+
+In this tutorial, we will import a single plate from a high content screen performed
+on 96 well plates. The input data that we are going to use are class labels for 
+each single cell. These classification results have been obtained using a machine 
+learning alogrithm based on the original image features. The data produced is similar
+to the one in @Neumann_2010.
+
+<!-- ![96_well_plate.jpeg](96_well_plate.jpeg) -->
 
 # Annotation import
 
@@ -112,7 +123,7 @@ An observation contains all values measured on the same unit (like a person, or 
 or a race) across attributes.
 
 A tidy data frame now organizes the data in such a way that
-each observation corresponds to an single line in the data set.
+each observation corresponds to an single line in the data set.# References
 This is in general the most appropriate format for downstream analysis, although
 it might not be the most appropriate form for viewing the data.
 
@@ -136,7 +147,7 @@ tidy_raw_data$well <- str_replace(tidy_raw_data$well, "^W([A-H][0-9]{2})_P1", "\
 #join annotation
 
 input_data <- left_join(tidy_raw_data, plate_map, by = c("well" = "Position"))
-
+# References
 
 ```
 
@@ -198,12 +209,13 @@ plotScreen(list(logistic (full_data$Apoptosis)), ncol = 1, nx = 12, ny = 8,
 
 ## Other clustering methods, changing the ggplot2 plot
 
-
+# Session information
 
 ```{r seesionInfo, results='markup'}
 sessionInfo()
 ```
 
 
+# References
 
 
