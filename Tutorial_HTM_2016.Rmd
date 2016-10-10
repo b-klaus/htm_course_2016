@@ -62,7 +62,10 @@ to the one in @Neumann_2010.
 
 # Annotation import
 
-```{r}
+We first import the annotation of the plate. This consists of table that informs
+us about the content of every single well on the plate.
+
+```{r import_annotation}
 data_path <- "~/p12_data"
 plate_map <- read.xlsx(xlsxFile = file.path(data_path, "plate_mapping.xlsx"))
 head(plate_map)
@@ -71,10 +74,20 @@ head(plate_map)
 
 # Importing the raw data
 
-* importing using `r Biocpkg("rhdf5")`
-* possibly discuss the hdf5 format
+We will now import the raw data. This data is stored in a variant of the [HDF5 format](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) called
+"[CellH5]"(http://www.cellh5.org/),
+which defines a more restricted sub-format designed specificially to store data
+from hight content screens. More information can be found in the paper by 
+@Sommer.
 
-```{r readingCellH5, eval=FALSE}
+In the code below, we use the [cellh5](https://github.com/CellH5/cellh5-R) R--package 
+to import the data. The file `_all_positions.ch5` contains links to the other `ch5`
+files that contain the full data of the plate. 
+We are only interested in the predictions produced 
+by the machine learning algorithm, so we only extract this part of the file.
+
+
+```{r readingCellH5, dependson="plate_map", eval=FALSE}
 path <- file.path(data_path, "_all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
@@ -85,7 +98,9 @@ c5_pos[["WB08_P1"]] <- NULL
 ```
 
 
-# Extract raw data
+# Tabulate the raw data
+
+We now ta the importa
 
 ```{r, eval=FALSE}
 

@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><a href="#about-the-tutorial"><span class="toc-section-number">2</span> About the tutorial</a></li>
 <li><a href="#annotation-import"><span class="toc-section-number">3</span> Annotation import</a></li>
 <li><a href="#importing-the-raw-data"><span class="toc-section-number">4</span> Importing the raw data</a></li>
-<li><a href="#extract-raw-data"><span class="toc-section-number">5</span> Extract raw data</a></li>
+<li><a href="#tabulate-the-raw-data"><span class="toc-section-number">5</span> Tabulate the raw data</a></li>
 <li><a href="#the-concept-of-tidy-data"><span class="toc-section-number">6</span> The concept of tidy data</a></li>
 <li><a href="#reshaping-the-screen-data"><span class="toc-section-number">7</span> Reshaping the screen data</a><ul>
 <li><a href="#plotting-in-r-ggplot2"><span class="toc-section-number">7.1</span> Plotting in R: ggplot2</a></li>
@@ -126,6 +126,7 @@ rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
 </div>
 <div id="annotation-import" class="section level1">
 <h1><span class="header-section-number">3</span> Annotation import</h1>
+<p>We first import the annotation of the plate. This consists of table that informs us about the content of every single well on the plate.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data_path &lt;-<span class="st"> &quot;~/p12_data&quot;</span>
 plate_map &lt;-<span class="st"> </span><span class="kw">read.xlsx</span>(<span class="dt">xlsxFile =</span> <span class="kw">file.path</span>(data_path, <span class="st">&quot;plate_mapping.xlsx&quot;</span>))
 <span class="kw">head</span>(plate_map)</code></pre></div>
@@ -139,10 +140,8 @@ plate_map &lt;-<span class="st"> </span><span class="kw">read.xlsx</span>(<span 
 </div>
 <div id="importing-the-raw-data" class="section level1">
 <h1><span class="header-section-number">4</span> Importing the raw data</h1>
-<ul>
-<li>importing using <em><a href="http://bioconductor.org/packages/rhdf5">rhdf5</a></em></li>
-<li>possibly discuss the hdf5 format</li>
-</ul>
+<p>We will now import the raw data. This data is stored in a variant of the <a href="https://en.wikipedia.org/wiki/Hierarchical_Data_Format">HDF5 format</a> called “[CellH5]”(<a href="http://www.cellh5.org/" class="uri">http://www.cellh5.org/</a>), which defines a more restricted sub-format designed specificially to store data from hight content screens. More information can be found in the paper by <span class="citation">(<span class="citeproc-not-found" data-reference-id="Sommer"><strong>???</strong></span>)</span>.</p>
+<p>In the code below, we use the <a href="https://github.com/CellH5/cellh5-R">cellh5</a> R–package to import the data. The file <code>_all_positions.ch5</code> contains links to the other <code>ch5</code> files that contain the full data of the plate. We are only interested in the predictions produced by the machine learning algorithm, so we only extract this part of the file.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> </span><span class="kw">file.path</span>(data_path, <span class="st">&quot;_all_positions.ch5&quot;</span>)
 c5f &lt;-<span class="st"> </span><span class="kw">CellH5</span>(path)
 c5_pos &lt;-<span class="st"> </span><span class="kw">C5Positions</span>(c5f, <span class="kw">C5Plates</span>(c5f))
@@ -150,8 +149,9 @@ predictions &lt;-<span class="st"> </span><span class="kw">C5Predictions</span>(
 
 c5_pos[[<span class="st">&quot;WB08_P1&quot;</span>]] &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre></div>
 </div>
-<div id="extract-raw-data" class="section level1">
-<h1><span class="header-section-number">5</span> Extract raw data</h1>
+<div id="tabulate-the-raw-data" class="section level1">
+<h1><span class="header-section-number">5</span> Tabulate the raw data</h1>
+<p>We now ta the importa</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">raw_data &lt;-<span class="st"> </span><span class="kw">sapply</span>(c5_pos, function(pos){
                 predictions &lt;-<span class="st"> </span><span class="kw">C5Predictions</span>(c5f, pos, <span class="dt">mask =</span> <span class="st">&quot;primary__primary3&quot;</span>, <span class="dt">as =</span> <span class="st">&quot;name&quot;</span>)
                 <span class="kw">table</span>(predictions)}
