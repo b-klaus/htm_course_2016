@@ -87,7 +87,7 @@ We are only interested in the predictions produced
 by the machine learning algorithm, so we only extract this part of the file.
 
 
-```{r readingCellH5, dependson="plate_map", eval=FALSE}
+```{r readCellH5, dependson="plate_map", eval=FALSE}
 path <- file.path(data_path, "_all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
@@ -100,9 +100,15 @@ c5_pos[["WB08_P1"]] <- NULL
 
 # Tabulate the raw data
 
-We now ta the importa
+We now tabulate the raw data: we compute how many cells are assigned to each 
+class for each well. The result is a data matrix, which contains the wells of
+the screen plate in the columns and the counts for the respective classes in the
+rows.
 
-```{r, eval=FALSE}
+This is a typical example of a "wide" data table, where the variables 
+contained in the data set spread across multiple columns. 
+
+```{r import_data_table, dependson="readCellH5", eval=FALSE}
 
 raw_data <- sapply(c5_pos, function(pos){
                 predictions <- C5Predictions(c5f, pos, mask = "primary__primary3", as = "name")
@@ -110,60 +116,82 @@ raw_data <- sapply(c5_pos, function(pos){
                )                     
 save(raw_data, file = "raw_data.RData")
 
+head(raw_data)
+
 ```
 
 
-* discuss score computation from phenotype classification results
-
 
 # The concept of tidy data
-A lot of analysis time is spent on the process of cleaning and preparing
-the data. Data preparation is not just a first step, but must be
-repeated many over the course of analysis as new problems come to light or new data is
-collected. An often neglected, but important aspect of data cleaning is
-data tidying: structuring datasets to facilitate analysis.
-
-
-This "data tidying" includes the ability to move
-data between different different shapes.
-
 
 In a nutshell, a  dataset is a collection of values, usually either numbers
-(if quantitative) or
-strings (if qualitative). Values are organized in two ways. Every value belongs to a
-variable and an observation. A variable contains all values that measure the same
-underlying attribute (like height, temperature, duration) across units.
+(if quantitative) or strings (if qualitative). Values are organized in two ways:
+Every value belongs to a variable and an observation.
 
-An observation contains all values measured on the same unit (like a person, or a day,
+A variable 
+contains all values that measure the same underlying attribute 
+(like height, temperature, duration) across units.  An observation 
+contains all values measured on the same unit (like a person, or a day, 
 or a race) across attributes.
 
-A tidy data frame now organizes the data in such a way that
-each observation corresponds to an single line in the data set.# References
-This is in general the most appropriate format for downstream analysis, although
-it might not be the most appropriate form for viewing the data.
+Now, a tidy data frame now organizes the data in such a way that
+each observation corresponds to an single line in the data set. This representation
+is often refered to as a "long" data tables.
 
-For a thorough discussion of this topic see the paper by
-[Hadley Wickham - tidy data](\href{http://www.jstatsoft.org/v59/i10/paper).
+In general, a long data table is  the most appropriate format for 
+downstream analysis, although a wide representation is better for viewing 
+the data. For a thorough discussion of this topic see the paper by
+Hadley @Wickham.
+
+In any case, we often need to move between the different shapes. The 
+`r CRANpkg("tidyr")` has two main functions that allows us to go back and forth:
+
+* `gather()` takes multiple columns, and gathers them 
+into key--value pairs: it  makes  "wide" data longer.
+
+*`spread()` takes two columns (key \& value) and
+spreads into multiple columns, it makes "long" data wider.
 
 
-# Reshaping the screen data
+# Reshaping the screen data and joining the plate annotation
 
-* [regex tutorial](http://www.zytrax.com/tech/web/regex.htm)
+We now reshape the input data, which is in a long format into a wide format.
+For this, we first turn the row names into an explicit column and then gather
+all the columns representing wells.
 
+The result is a "long" data table, which contains one observation per row: in our 
+case the number of times a cell was assigned to a specific class in every single
+well. Class in combination with well serve as our "key" here, and the class--count
+is the associated value.
 
-```{r}
+We now want to join the annotation to this data table in the long format. Before
+we can do this however, we need to solve a subtle problem: Our well identifiers
+in the imported data are different from the identifiers in the annotation table
+so we cannot easily join the two tables togehter. 
+
+We first need to strip the lead "W" from the well identifiers and replace the 
+"P1" suffix by a "01" suffix. We do this by using a regular expression. Regular
+expressions are a powerful tool for the handling of strings and one can find
+a nice tutorial about them here: [regex tutorial](http://www.zytrax.com/tech/web/regex.htm).
+
+We can now join the annotation to our long table and use the well as the joining
+key.
+
+```{r reshape, dependson="import_data_table"}
 load("raw_data.RData")
 
 tidy_raw_data  <- rownames_to_column(as.data.frame(raw_data), var = "class") %>%
                    gather(key = "well", value = "count", WA01_P1:WC07_P1)
+
+sample_n(tidy_raw_data, 6)
 
 tidy_raw_data$well <- str_replace(tidy_raw_data$well, "^W([A-H][0-9]{2})_P1", "\\1_01")
 
 #join annotation
 
 input_data <- left_join(tidy_raw_data, plate_map, by = c("well" = "Position"))
-# References
 
+sample_n(input_data, 6)
 ```
 
 ## Plotting in R: ggplot2
