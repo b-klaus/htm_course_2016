@@ -78,7 +78,7 @@ We will now import the raw data. This data is stored in a variant of the [HDF5 f
 "[CellH5]"(http://www.cellh5.org/),
 which defines a more restricted sub-format designed specificially to store data
 from hight content screens. More information can be found in the paper by 
-@Sommer.
+@Sommer_2013.
 
 In the code below, we use the [cellh5](https://github.com/CellH5/cellh5-R) R--package 
 to import the data. The file `_all_positions.ch5` contains links to the other `ch5`
@@ -141,12 +141,12 @@ is often refered to as a "long" data tables.
 In general, a long data table is  the most appropriate format for 
 downstream analysis, although a wide representation is better for viewing 
 the data. For a thorough discussion of this topic see the paper by
-Hadley @Wickham.
+Hadley @greycite53870.
 
 In any case, we often need to move between the different shapes. The 
 `r CRANpkg("tidyr")` has two main functions that allows us to go back and forth:
 
-* `gather()` takes multiple columns, and gathers them 
+*`gather()` takes multiple columns, and gathers them 
 into key--value pairs: it  makes  "wide" data longer.
 
 *`spread()` takes two columns (key \& value) and
@@ -194,9 +194,115 @@ input_data <- left_join(tidy_raw_data, plate_map, by = c("well" = "Position"))
 sample_n(input_data, 6)
 ```
 
-## Plotting in R: ggplot2
+# Plotting in R: ggplot2
 
-## Creating the PCA plot
+`r CRANpkg("ggplot2") ` is a package by Hadley Wickham 
+that implements the idea of __grammar of graphics__:  There is a grammar 
+to the composition of graphical components in  and by directly controlling that 
+grammar, you can generate  a large set of graphics 
+tailored to your particular needs. 
+
+The central concept of the approach is that 
+plots convey information through various aspects of their aesthetics.
+Aesthetics are mappings from the data to something you can visually perceive.
+Some aesthetics that plots use are:
+
+
+* x position
+* y position
+* size of elements
+* shape of elements
+* color of elements
+
+
+The elements in a plot are geometric shapes, like
+
+* points
+* lines
+* line segments
+* bars
+* text
+
+
+Comprehensive documentation for the package can
+be found [on its website](http://ggplot2.org).  The online documentation includes
+example use cases for a lot of the graphic types  and is an invaluable resource 
+when creating figures.
+
+In `r CRANpkg("ggplot2") ` each component is added to the plot as a layer, 
+hence you might start with 
+a simple mapping of the raw data to the x-- and y--axes, creating a scatterplot.
+A second layer may the be added by coloring the points according to a
+group they belong to and so on.
+
+
+The values represented in the plot are the product of various statistics.
+If you just plot the 
+raw data, you can think of each point representing the identity statistic. 
+
+Bar charts however, often represent the mean or a count statistic, while 
+histograms are bar charts where the bars represent the binned count or density 
+statistics and so on.
+
+Let's start by  creating a simple plot: Data from an
+enzyme-linked immunosorbent assay (ELISA) assay. The assay was used to quantify the
+activity of the enzyme deoxyribonuclease (DNase), which degrades DNA. The data are
+assembled in the R object `DNase`, which conveniently comes with base R.
+`DNase` is a dataframe whose columns are `Run`, the assay run;
+`conc`, the protein concentration that was used; and `density`, the
+measured optical density.
+
+```{r figredobasicplottingwithggplot, fig.width = 3.5, fig.height = 5}
+ggplot(DNase, aes(x = conc, y = density, color = Run)) + geom_point() 
+```
+
+We just wrote our first `sentence` using the grammar of graphics. 
+Let us deconstruct this sentence.
+First, we specified the dataframe that contains the data, `DNase`.
+Then we told `ggplot` via the aesthetics `aes` argument which variables 
+we want on the $x$- and $y$-axes, respectively and mapped the run number 
+to the color aesthetic.
+Finally, we stated that we want the plot to use points, by adding the result 
+of calling the function `geom\_point`. 
+
+
+
+# Principal component analysis (PCA) to for data visualization
+
+PCA is primarily an exploratory technique which produces
+maps that show the relations between the variables and between observations in a
+useful way. It procedes by computing principal components of the original data, 
+which are _linear combinations_ of the variables originally measured.
+
+To understand what a linear combination
+really is, we can take an analogy, when making a healthy juice
+mix, you can follow a recipe.
+
+![Juice](Vegetable-Juice.jpg)
+![Recipe](RecipeVeggie.jpg)
+
+$$
+V=2\times \mbox{ Beets }+ 1\times \mbox{Carrots } +\frac{1}{2} \mbox{ Gala}+ \frac{1}{2} \mbox{ GrannySmith}
++0.02\times \mbox{ Ginger} +0.25 \mbox{ Lemon }
+$$
+This recipe is a linear combination of individual juice types (the
+original
+variables). The result is a new variable $V$, the coefficients
+$(2,1,\frac{1}{2},\frac{1}{2},0.02,0.25)$
+ are called the _loadings_.
+ 
+A linear combination of variables defines a line in higher dimensions in the same way
+as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. There
+are many ways to choose lines onto which we project the data, there is however a
+"best" line for our purposes.
+
+PCA is based on the principle of finding the axis showing the largest variability,
+removing the variability in that direction and then iterating to find 
+the next best orthogonal axis so on. Variability is a proxy for information content,
+so extracting new variables than retain as much variability in the data as possible
+is sensible.
+
+# Using ggplot to create a PCA plot for the data
 
 ```{r}
 
@@ -227,15 +333,18 @@ genes <- ifelse(is.na(genes$gene), "empty", genes$gene)
 dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
                     PC3 = PCA$x[,3], PC4 = PCA$x[,4],
                     genes)
-(qplot(PC1, PC2, data = dataGG, color =  genes, geom = "text",
-       label = genes, asp = 1,
-       main = "PC1 vs PC2, top variable genes", size = I(6))
-)
+
+pl <- (ggplot(dataGG, aes(x = PC1, 
+                 y = PC2, color =  genes))
+      + geom_text(aes(label = genes), size = I(4))
+      + coord_equal()
+      + ggtitle("Principal component plot")
+    )
 
 ```
 
 
-# Heatmap of apoptosis z--scores
+# Heatmap of apoptosis proportions
 
 ```{r heatmap_apoptosis}
 dat_rows = toupper(letters[1:8])
@@ -249,8 +358,6 @@ plotScreen(list(logistic (full_data$Apoptosis)), ncol = 1, nx = 12, ny = 8,
 
 ```
 
-
-## Other clustering methods, changing the ggplot2 plot
 
 # Session information
 
