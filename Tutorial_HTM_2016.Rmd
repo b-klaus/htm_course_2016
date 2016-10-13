@@ -429,19 +429,45 @@ We can see that the control wells cluster together. Note that it is easy to turn
 this plot into an interactive version using `ggplotly` from the `r CRANpkg("plotly")`.
 
 
-# Heatmap of apoptosis proportions
+# Plate heatmap of apoptosis proportions
+
+Heatmaps are a powerful of visualising large, matrix-like datasets and giving a quick
+overview over the patterns that might be in there. There are a number of heatmap drawing
+functions in R; one that is convenient and produces good-looking output is the function
+`pheatmap` from the eponymous package. 
+
+However, here we will use ggplot to create the heatmap. We first join all the
+well IDs to the data, so that we can plot missing values in a uniform fashion.
+
+Then we extract the row (letters) and column (numbers) from the well ID and
+finally map the rows to the y--axis, the columns to the x--axis and the color
+fill to the percentage values for apoptosis
+
+The heatmap plot shows that well A08 contains a high percentage of apoptic
+cells compared to the other wells.
 
 ```{r heatmap_apoptosis}
+
 dat_rows = toupper(letters[1:8])
 dat_cols = c(paste0("0",seq(1:9)),seq(10,12))
 wells <- data.frame( well = paste0(outer(dat_rows, dat_cols, paste0), "_01"))
-full_data <- arrange(full_join(data_for_PCA, wells), well)
 
-plotScreen(list(logistic (full_data$Apoptosis)), ncol = 1, nx = 12, ny = 8, 
-           main = "Apoptosis percentages",
-           do.names = FALSE, legend.label = "percentage of apoptotic cells ", zrange = c(0,.4) )
+data_for_heatmap <- arrange(full_join(data_for_PCA, wells), well) %>%
+                    select(well, Apoptosis) %>%
+                    extract(well, into = c("row", "column"), 
+                            regex = "([A-Z])([0-9]{2})", remove = FALSE) %>%
+                    mutate(perc_apoptosis = logistic(Apoptosis)) %>%
+                    mutate(row = factor(row, 
+                           levels = sort(unique(row), decreasing = TRUE)))
 
+theme_set(theme_bw())       
+heatmap <- (ggplot(data_for_heatmap, aes(column, row))
+          + geom_tile(aes(fill = perc_apoptosis))
+          + scale_fill_distiller(type = "seq", palette = "RdYlBu"))
+
+heatmap
 ```
+
 
 
 # Session information
