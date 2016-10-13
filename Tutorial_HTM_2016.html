@@ -245,8 +245,10 @@ input_data &lt;-<span class="st"> </span><span class="kw">left_join</span>(tidy_
 V=2\times \mbox{ Beets }+ 1\times \mbox{Carrots } +\frac{1}{2} \mbox{ Gala}+ \frac{1}{2} \mbox{ GrannySmith}
 +0.02\times \mbox{ Ginger} +0.25 \mbox{ Lemon }
 \]</span> This recipe is a linear combination of individual juice types (the original variables). The result is a new variable <span class="math inline">\(V\)</span>, the coefficients <span class="math inline">\((2,1,\frac{1}{2},\frac{1}{2},0.02,0.25)\)</span> are called the <em>loadings</em>.</p>
-<p>A linear combination of variables defines a line in higher dimensions in the same way as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. There are many ways to choose lines onto which we project the data, there is however a “best” line for our purposes.</p>
-<p>PCA is based on the principle of finding the axis showing the largest variability, removing the variability in that direction and then iterating to find the next best orthogonal axis so on. Variability is a proxy for information content, so extracting new variables than retain as much variability in the data as possible is sensible.</p>
+<p>A linear combination of variables defines a line in higher dimensions in the same way as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions.</p>
+<p>There are many ways to choose lines onto which we project the data. PCA chooses the line in such a way that the distance of the data points to the line is minimized, and the variance of the orthogonal projections of the data points along the line is maximized.</p>
+<p>Spreading points out to maximize the variance of the projected points will show more ‘information’.</p>
+<p>For computing multiple axes, PCA finds the axis showing the largest variability, removing the variability in that direction and then iterating to find the next best orthogonal axis so on.</p>
 </div>
 <div id="using-ggplot-to-create-a-pca-plot-for-the-data" class="section level1">
 <h1><span class="header-section-number">10</span> Using ggplot to create a PCA plot for the data</h1>

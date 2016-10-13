@@ -292,15 +292,19 @@ $(2,1,\frac{1}{2},\frac{1}{2},0.02,0.25)$
  are called the _loadings_.
  
 A linear combination of variables defines a line in higher dimensions in the same way
-as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. There
-are many ways to choose lines onto which we project the data, there is however a
-"best" line for our purposes.
+as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. 
 
-PCA is based on the principle of finding the axis showing the largest variability,
+There are many ways to choose lines onto which we project the data. 
+PCA chooses the line in such a way that the distance of the data points
+to the line is minimized, and the variance of the orthogonal projections 
+of the data points along the line is maximized.
+
+Spreading points out to maximize the variance of the projected points will show
+more 'information'. 
+
+For computing multiple axes, PCA finds the axis showing the largest variability,
 removing the variability in that direction and then iterating to find 
-the next best orthogonal axis so on. Variability is a proxy for information content,
-so extracting new variables than retain as much variability in the data as possible
-is sensible.
+the next best orthogonal axis so on. 
 
 # Using ggplot to create a PCA plot for the data
 
