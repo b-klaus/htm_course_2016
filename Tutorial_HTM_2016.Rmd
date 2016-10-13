@@ -292,15 +292,19 @@ $(2,1,\frac{1}{2},\frac{1}{2},0.02,0.25)$
  are called the _loadings_.
  
 A linear combination of variables defines a line in higher dimensions in the same way
-as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. There
-are many ways to choose lines onto which we project the data, there is however a
-"best" line for our purposes.
+as e.g. a simple linear regression defines a line in the scatterplot plane of two dimensions. 
 
-PCA is based on the principle of finding the axis showing the largest variability,
+There are many ways to choose lines onto which we project the data. 
+PCA chooses the line in such a way that the distance of the data points
+to the line is minimized, and the variance of the orthogonal projections 
+of the data points along the line is maximized.
+
+Spreading points out to maximize the variance of the projected points will show
+more 'information'. 
+
+For computing multiple axes, PCA finds the axis showing the largest variability,
 removing the variability in that direction and then iterating to find 
-the next best orthogonal axis so on. Variability is a proxy for information content,
-so extracting new variables than retain as much variability in the data as possible
-is sensible.
+the next best orthogonal axis so on. 
 
 # Using ggplot to create a PCA plot for the data
 
@@ -390,14 +394,16 @@ x-- and the second one to the y--axis. We use the gene names as plotting symbols
 and  color the names according to to the gene name (As we have multiple empty wells
 as well as multiple siRNAs targeting the same gene).
 
-Furthemore, we specify that the aspect ratio of x and y axis should be 1, so that
-the units are same on both axes. This is important for a correct interpreation
-of the PCA plot.
+Furthemore, we specify that the aspect ratio of x and y axis should be equal to 
+the ratio of the variance explained by PC1 to the variance explained by PC2 so
+that the axes represent the same units. This facilitates a correct interpretation 
+of the PCA plot: PC1 has more variance than PC2, so the x--axis should 
+be longer than the y--axis to reflect the differences in scale.
 
 
 ```{r PCA, dependson="grouping_and_summarizing"}
 data_for_PCA <- data_for_PCA %>% 
-                select(class, well, z_score) %>%
+                dplyr::select(class, well, z_score) %>%
                 spread(key = class, value = z_score)
 
 
@@ -407,7 +413,7 @@ PCA <- prcomp(data_for_PCA[, -1], center = TRUE, scale. = TRUE)
 
 genes <- input_data %>%
          group_by(well) %>%
-         summarize(gene = unique(Gene.Symbol))
+        dplyr::summarize(gene = unique(Gene.Symbol))
 
 genes <- ifelse(is.na(genes$gene), "empty", genes$gene)
 
@@ -418,8 +424,8 @@ dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
 pl <- (ggplot(dataGG, aes(x = PC1, 
                  y = PC2, color =  genes))
       + geom_text(aes(label = genes), size = I(4))
-      + coord_equal()
-      + ggtitle("Principal component plot")
+      + coord_fixed(ratio = (PCA$sdev^2)[2] / (PCA$sdev^2)[1])
+      + ggtitle("Principal components plot")
     )
 
 pl
