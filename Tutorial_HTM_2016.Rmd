@@ -40,7 +40,7 @@ cache = TRUE)
 devtools::install_github("CellH5/cellh5-R")
 ```
 
-```{r required packages and data, echo = TRUE, message=FALSE}
+```{r required_packages_and_data, echo = TRUE, message=FALSE}
 library(rmarkdown)
 library(tidyverse)
 library(openxlsx)
@@ -304,22 +304,103 @@ is sensible.
 
 # Using ggplot to create a PCA plot for the data
 
-```{r}
+
+Before we can compute a PCA, we have to make sure that the variables that
+we have obtained for every single well  are normalized. As our data consists
+of the number of cells each phenotypic category a straigforward normalization 
+consits of transforming the counts into percentages by dividing the data
+for each well by its total number of cells.
+
+## The chaining operator
+
+For this, we use the chaining (or piping) operator `%>%`. 
+$x \% \textgreater \% f(y) $ is simply $f(x, y)$, so one can use
+it to rewrite multiple operations in such a way that they can be read
+from you can read from left--to--right,
+top--to--bottom. A simple example will make that clear: We create 
+two vectors and calculate Euclidian distance between them. Instead of
+the usual way:
+
+```{r chainingSimpleExample_1}
+x1 <- 1:5; x2 <- 2:6
+sqrt(sum((x1-x2)^2))
+```
+
+We can use the piping operatror
+
+```{r chainingSimpleExample_2}
+(x1-x2)^2 %>%
+sum() %>%
+sqrt()
+```
+
+Which makes the set of operations much easier to digest and understand.
+
+## Grouping, summarizing and data transformation
+
+Having tidy data frames, we can employ  a __split--apply--combine__
+strategy for data analysis. What this means is that wer first group our 
+individual observations by one or more factors (_split_ operation), then 
+_apply_ computations to each group and then combine the results into new
+data frame that contains one line per group
+
+In the code chunk below, we  use the`group\_by()` function 
+to splot the  dataset into groups according to the well ID. 
+We then apply the function `sum()` to the counts of each well and
+use`summarize()` to obtain a table of counts per well.
+
+
+We can now join the table containing the sums to the original
+data and compute compute percentage using the sums.
+
+As PCA works best on data that is on normal distribution  (z--score) scale,
+we perform at [logit](https://en.wikipedia.org/wiki/Logit) transformation 
+to turn the percentages
+into z--scores. This is similar in spirit to a log transformation on
+intensity values.
+
+
+```{r grouping_and_summarizing, dependson="reshape"}
 
 no_cells_per_well <- input_data %>%
                     group_by(well) %>%
                     summarize(no_cells = sum(count))
 
-data_with_sums <-  left_join(input_data, no_cells_per_well)
+head(no_cells_per_well)
 
-# size_factors <- no_cells_per_well$no_cells /  geometric.mean(no_cells_per_well$no_cells)          
+data_with_sums <-  left_join(input_data, no_cells_per_well)
 
 data_for_PCA <- mutate(data_with_sums, perc = count / no_cells, 
                        z_score = logit(perc))
 
+head(data_for_PCA)
+```
+
+## creating the PCA plot using ggplot2
+
+We are now ready to create the PCA plot. For this, we first need to turn
+the input data into a wide data frame again by spreading the z--scores across
+columns.
+
+We can then use the function `prcomp()` to compute the actual principal components.
+We also create a vector genes, giving us the gene each of our siRNAs is targeting.
+
+We then create a ggplot object by mapping the first principal component to the 
+x-- and the second one to the y--axis. We use the gene names as plotting symbols
+and  color the names according to to the gene name (As we have multiple empty wells
+as well as multiple siRNAs targeting the same gene).
+
+Furthemore, we specify that the aspect ratio of x and y axis should be 1, so that
+the units are same on both axes. This is important for a correct interpreation
+of the PCA plot.
+
+
+```{r PCA, dependson="grouping_and_summarizing"}
 data_for_PCA <- data_for_PCA %>% 
                 select(class, well, z_score) %>%
                 spread(key = class, value = z_score)
+
+
 
 PCA <- prcomp(data_for_PCA[, -1], center = TRUE, scale. = TRUE)
 
@@ -341,7 +422,11 @@ pl <- (ggplot(dataGG, aes(x = PC1,
       + ggtitle("Principal component plot")
     )
 
+pl
 ```
+
+We can see that the control wells cluster together. Note that it is easy to turn
+this plot into an interactive version using `ggplotly` from the `r CRANpkg("plotly")`.
 
 
 # Heatmap of apoptosis proportions
