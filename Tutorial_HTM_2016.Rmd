@@ -66,8 +66,8 @@ We first import the annotation of the plate. This consists of table that informs
 us about the content of every single well on the plate.
 
 ```{r import_annotation}
-data_path <- "~/p12_data"
-plate_map <- read.xlsx(xlsxFile = file.path(data_path, "plate_mapping.xlsx"))
+data_path <- "~/embo_course_2014"
+plate_map <- read.xlsx(xlsxFile = file.path("plate_mapping.xlsx"))
 head(plate_map)
 ```
 
@@ -88,7 +88,10 @@ by the machine learning algorithm, so we only extract this part of the file.
 
 
 ```{r readCellH5, dependson="plate_map", eval=FALSE}
-path <- file.path(data_path, "_all_positions.ch5")
+# path <- file.path(data_path, "Analysis_new/hdf5/_all_positions.ch5")
+#path <- "~/embo_course_2014/Analysis_new/hdf5/_all_positions.ch5"
+
+path <-  "/g/huber/course/htm_course_2016/embo_course_2014/Analysis_new/hdf5/_all_positions.ch5"
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
 predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary3", as = "name")
