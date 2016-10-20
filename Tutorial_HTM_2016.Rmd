@@ -283,7 +283,7 @@ this plot into an interactive version using `ggplotly` from the `r CRANpkg("plot
 The first PC nicely separates wells containing various controls from the ones
 treated with siRNAs. As every component is simply a weighted sum of the original 
 variables, we can inspect these weights (called "loadings") to see which classes
-"drive" the components.
+"drive" the components and try to interpret what we find.
 
 ```{r var_imp, dependson="PCA"}
 loadings <- PCA$rotation[, 1:2]
@@ -309,10 +309,12 @@ define cells that are in mitotic delay / arrest, while the interphase class defi
 a control category.
 
 So a possible explanation for PC1 would be that it separates
-cells in mitotic arrest/delay from cells in the interphase 
-as well as apoptotic cells. (c.f. Figure 1 of @Neumann_2010).
+wells with cells in mitotic arrest/delay (or apoptotic cells) from control 
+wells with many cells in the interphase phase. (c.f. Figure 1 of @Neumann_2010).
 
-
+The second principal component seems to separate wells that contain mainly
+cells in ana--/metaphase from wells that predominantly contains cells with
+strange shape phenotypes.
 
 # Plate heatmap of apoptosis proportions
 
