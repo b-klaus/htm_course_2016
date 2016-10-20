@@ -282,7 +282,7 @@ pl</code></pre></div>
 </div>
 <div id="variable-importance-for-the-principal-components" class="section level2">
 <h2><span class="header-section-number">7.3</span> Variable importance for the principal components</h2>
-<p>The first PC nicely separates wells containing various controls from the ones treated with siRNAs. As every component is simply a weighted sum of the original variables, we can inspect these weights (called “loadings”) to see which classes “drive” the components.</p>
+<p>The first PC nicely separates wells containing various controls from the ones treated with siRNAs. As every component is simply a weighted sum of the original variables, we can inspect these weights (called “loadings”) to see which classes “drive” the components and try to interpret what we find.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">loadings &lt;-<span class="st"> </span>PCA$rotation[, <span class="dv">1</span>:<span class="dv">2</span>]
 loadings_gg &lt;-<span class="st"> </span>loadings %&gt;%
 <span class="st">               </span><span class="kw">as.data.frame</span>() %&gt;%
@@ -300,7 +300,8 @@ loadings_gg &lt;-<span class="st"> </span>loadings %&gt;%
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">      <span class="co"># geom_hline(aes(yintercept = 0.25, color = I(&quot;grey80&quot;))) +</span>
       <span class="co"># geom_hline(aes(yintercept = -0.25, color = I(&quot;coral3&quot;)))</span></code></pre></div>
 <p>We can see that e.g. the “inter” and the “map /prometa” classes as well as the “apo” class are important for PC1. The map and prometa classes combined define cells that are in mitotic delay / arrest, while the interphase class defines a control category.</p>
-<p>So a possible explanation for PC1 would be that it separates cells in mitotic arrest/delay from cells in the interphase as well as apoptotic cells. (c.f. Figure 1 of <span class="citation">Neumann et al. (2010)</span>).</p>
+<p>So a possible explanation for PC1 would be that it separates wells with cells in mitotic arrest/delay (or apoptotic cells) from control wells with many cells in the interphase phase. (c.f. Figure 1 of <span class="citation">Neumann et al. (2010)</span>).</p>
+<p>The second principal component seems to separate wells that contain mainly cells in ana–/metaphase from wells that predominantly contains cells with strange shape phenotypes.</p>
 </div>
 </div>
 <div id="plate-heatmap-of-apoptosis-proportions" class="section level1">
