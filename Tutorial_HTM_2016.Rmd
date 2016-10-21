@@ -1,5 +1,5 @@
 ---
-title: "Visual Exploration of High--Throughput--Microscopy Data"
+title: "Visual Exploration of High-Throughput-Microscopy Data"
 author: "Bernd Klaus, Andrzej Oles, Mike Smith"
 date: "`r doc_date()`"
 bibliography: HTM_2016.bib
@@ -17,7 +17,7 @@ output:
 
 <!--
 To compile this document
-graphics.off();rm(list=ls());rmarkdown::render('Tutorial_HTM_2016.Rmd');purl('Tutorial_HTM_2016.Rmd')
+graphics.off();rm(list=ls());rmarkdown::render('Tutorial_HTM_2016.Rmd');knitr::purl('Tutorial_HTM_2016.Rmd')
 pdf document
 rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
 -->
@@ -27,7 +27,8 @@ library(knitr)
 options(digits=3, width=80)
 opts_chunk$set(echo=TRUE,tidy=FALSE,include=TRUE,
                dev='png', fig.width = 6, fig.height = 3.5, comment = '  ', dpi = 300,
-cache = TRUE)
+cache = FALSE)
+set.seed(2016)
 ```
 
 
@@ -68,7 +69,6 @@ targeting a certain gene, it can be empty, contain scrambled siRNAs or negative
 controls.
 
 ```{r import_annotation}
-data_path <- "~/embo_course_2014"
 plate_map <- read.xlsx(xlsxFile = file.path("plate_mapping.xlsx"))
 head(plate_map)
 ```
@@ -77,7 +77,7 @@ head(plate_map)
 # Importing the raw data
 
 We will now import the raw data. This data is stored in a variant of the [HDF5 format](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) called
-"[CellH5]"(http://www.cellh5.org/),
+["CellH5"](http://www.cellh5.org/),
 which defines a more restricted sub-format designed specifically to store data
 from high content screens. More information can be found in the paper by 
 @Sommer_2013.
@@ -89,9 +89,9 @@ We are only interested in the predictions produced
 by the machine learning algorithm, so we only extract this part of the file.
 
 
-```{r readCellH5, dependson="plate_map", eval=FALSE}
-#path <-  "/g/huber/course/htm_course_2016/embo_course_2014/Analysis_new/hdf5/_all_positions.ch5"
-path <-  "Z:/embo2016/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5"
+```{r readCellH5, dependson="plate_map"}
+path <- file.path(switch(.Platform$OS.type, unix = "/g", windows = "Z:"),
+                  "embo2016/htm2016/P12_Visual_Exploration/hdf5all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
 predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary", as = "name")
@@ -108,16 +108,14 @@ rows.
 This is a typical example of a "wide" data table, where the variables 
 contained in the data set spread across multiple columns. 
 
-```{r import_data_table, dependson="readCellH5", eval=FALSE}
-
-raw_data <- sapply(c5_pos, function(pos){
-                predictions <- C5Predictions(c5f, pos, mask = "primary__primary", as = "name")
-                table(predictions)}
-               )                     
+```{r import_data_table, dependson="readCellH5"}
+raw_data <- sapply(c5_pos,
+                    function(pos){
+                      predictions <- C5Predictions(c5f, pos, mask = "primary__primary", as = "name")
+                      table(predictions)
+                    })                     
 
 head(raw_data)
-
-save(raw_data, file = "raw_data.RData")
 ```
 
 
@@ -144,16 +142,14 @@ so we cannot easily join the two tables together.
 We first need to strip the lead "W" from the well identifiers and replace the 
 "P1" suffix by a "01" suffix. We do this by using a regular expression. Regular
 expressions are a powerful tool for the handling of strings and one can find
-a nice tutorial about them here: [regex tutorial](http://www.zytrax.com/tech/web/regex.htm).
+a nice tutorial about them [here](http://www.zytrax.com/tech/web/regex.htm).
 
 We can now join the annotation to our long table and use the well as the joining
 key.
 
 ```{r reshape, dependson="import_data_table"}
-load("raw_data.RData")
-
 tidy_raw_data  <- rownames_to_column(as.data.frame(raw_data), var = "class") %>%
-                   gather(key = "well", value = "count",-class)
+                  gather(key = "well", value = "count",-class)
 
 sample_n(tidy_raw_data, 6)
 
@@ -170,9 +166,9 @@ sample_n(input_data, 6)
 # Using ggplot to create a PCA plot for the data
 
 The data we have lives in a ten dimensional space, as every well contains
-cells classified into on of ten different classes. In order to produce a succinct
+cells classified into one of ten different classes. In order to produce a succinct
 overview of the data, one tries to reduce the dimensionality of the data.
-A popular way to do this, is to compute new, artificial, variables that 
+A popular way to do this is to compute new, artificial, variables that 
 are a weighted sum of the original variables. The weights are obtained in
 such a way that the variables are independent of each other and retain
 as much of the original variability (a proxy of information content) as
@@ -180,35 +176,35 @@ possible. These new variables are called "principal components" (PCs) of the dat
 
 Before we can compute the PCs, we have to make sure that the variables that
 we have obtained for every single well are normalized. As our data consists
-of the number of cells each phenotypic category a straightforward normalization 
+of the number of cells in each phenotypic category, a straightforward normalization 
 consists of transforming the counts into percentages by dividing the data
 for each well by its total number of cells.
 
 
 ## Grouping, summarizing and data transformation
 
-In the code chunk below, we  use the`group_by()` function 
+In the code chunk below, we  use the `group_by()` function 
 to plot the  dataset into groups according to the well ID. 
 We then apply the function `sum()` to the counts of each well and
 use `summarize()` to obtain a table of counts per well. This is an example
-of a __split--apply--combine__ strategy.
+of a __split-apply-combine__ strategy.
 
 
 We can now join the table containing the sums to the original
 data and compute compute percentage using the sums.
 
-As PCA works best on data that is on normal distribution (z--score) scale,
+As PCA works best on data that is on normal distribution (z-score) scale,
 we perform a [logit](https://en.wikipedia.org/wiki/Logit) transformation 
 to turn the percentages
-into z--scores. This is similar in spirit to a log transformation on
+into z-scores. This is similar in spirit to a log transformation on
 intensity values.
 
 
 ```{r grouping_and_summarizing, dependson="reshape"}
 
 no_cells_per_well <- input_data %>%
-                    group_by(well) %>%
-                    summarize(no_cells = sum(count))
+                     group_by(well) %>%
+                     summarize(no_cells = sum(count))
 
 head(no_cells_per_well)
 
@@ -226,7 +222,7 @@ computation into the next. This leads to more digestible code compared to e.g. l
 ## creating the PCA plot using ggplot2
 
 We are now ready to create the PCA plot. For this, we first need to turn
-the input data into a wide data frame again by spreading the z--scores across
+the input data into a wide data frame again by spreading the z-scores across
 columns.
 
 We can then use the function `prcomp()` to compute the actual principal components.
@@ -254,7 +250,7 @@ PCA <- prcomp(data_for_PCA[, -1], center = TRUE, scale. = TRUE)
 
 genes <- input_data %>%
          group_by(well) %>%
-        dplyr::summarize(gene = unique(Gene.Symbol))
+          dplyr::summarize(gene = unique(Gene.Symbol))
 
 genes <- ifelse(is.na(genes$gene), "empty", genes$gene)
 
@@ -262,12 +258,11 @@ dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
                     PC3 = PCA$x[,3], PC4 = PCA$x[,4],
                     genes)
 
-pl <- (ggplot(dataGG, aes(x = PC1, 
-                 y = PC2, color =  genes))
+pl <- (ggplot(dataGG, aes(x = PC1, y = PC2, color =  genes))
       + geom_text(aes(label = genes), size = I(2))
       + coord_fixed(ratio = (PCA$sdev^2)[2] / (PCA$sdev^2)[1])
       + ggtitle("Principal components plot")
-    )
+      )
 
 pl
 ```
@@ -321,9 +316,7 @@ variables with the components in a circle. Arrows that are orthogonal to one of
 the axis.
 
 ```{r co_circle, dependson="var_imp"}
-fviz_pca_var(PCA, col.circle="black",
-             title = "Correlation Circle for the PCA") +
-              coord_equal() 
+fviz_pca_var(PCA, col.circle="black", title="Correlation Circle for the PCA") + coord_equal() 
 ```
 We see that "apo", "artefact", "map" and "meta" are highly positively correlated 
 with  PC1, while "inter" is strongly negatively correlated with PC1, confirming 
