@@ -90,10 +90,11 @@ by the machine learning algorithm, so we only extract this part of the file.
 
 
 ```{r readCellH5, dependson="plate_map", eval=FALSE}
-path <-  "/g/huber/course/htm_course_2016/embo_course_2014/Analysis_new/hdf5/_all_positions.ch5"
+#path <-  "/g/huber/course/htm_course_2016/embo_course_2014/Analysis_new/hdf5/_all_positions.ch5"
+path <-  "Z:/embo2016/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5"
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
-predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary3", as = "name")
+predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary", as = "name")
 ```
 
 
