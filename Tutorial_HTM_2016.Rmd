@@ -63,7 +63,7 @@ to the one in @Neumann_2010: Each cell is classified into a mitotic phenotype cl
 # Annotation import
 
 We first import the annotation of the plate. This consists of table that informs
-us about the content of well on the plate. A well can be transfected with an siRNA
+us about the content of each well on the plate. A well can be transfected with an siRNA
 targeting a certain gene, it can be empty, contain scrambled siRNAs or negative
 controls.
 
@@ -169,16 +169,16 @@ sample_n(input_data, 6)
 # Using ggplot to create a PCA plot for the data
 
 The data we have lives in a ten dimensional space, as every well contains
-cells classified into on of ten different classes. In order to a succinct
+cells classified into on of ten different classes. In order to produce a succinct
 overview of the data, one tries to reduce the dimensionality of the data.
-A popular way to do this, is to compute a new, artificial variables that 
+A popular way to do this, is to compute new, artificial, variables that 
 are a weighted sum of the original variables. The weights are obtained in
 such a way that the variables are independent of each other and retain
 as much of the original variability (a proxy of information content) as
 possible. These new variables are called "principal components" (PCs) of the data. 
 
 Before we can compute the PCs, we have to make sure that the variables that
-we have obtained for every single well  are normalized. As our data consists
+we have obtained for every single well are normalized. As our data consists
 of the number of cells each phenotypic category a straightforward normalization 
 consists of transforming the counts into percentages by dividing the data
 for each well by its total number of cells.
@@ -189,15 +189,15 @@ for each well by its total number of cells.
 In the code chunk below, we  use the`group_by()` function 
 to plot the  dataset into groups according to the well ID. 
 We then apply the function `sum()` to the counts of each well and
-use`summarize()` to obtain a table of counts per well. This is an example
+use `summarize()` to obtain a table of counts per well. This is an example
 of a __split--apply--combine__ strategy.
 
 
 We can now join the table containing the sums to the original
 data and compute compute percentage using the sums.
 
-As PCA works best on data that is on normal distribution  (z--score) scale,
-we perform at [logit](https://en.wikipedia.org/wiki/Logit) transformation 
+As PCA works best on data that is on normal distribution (z--score) scale,
+we perform a [logit](https://en.wikipedia.org/wiki/Logit) transformation 
 to turn the percentages
 into z--scores. This is similar in spirit to a log transformation on
 intensity values.
