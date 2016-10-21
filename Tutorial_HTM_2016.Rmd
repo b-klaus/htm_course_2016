@@ -248,8 +248,6 @@ data_for_PCA <- data_for_PCA %>%
                 dplyr::select(class, well, z_score) %>%
                 spread(key = class, value = z_score)
 
-
-
 PCA <- prcomp(data_for_PCA[, -1], center = TRUE, scale. = TRUE)
 
 
@@ -265,7 +263,7 @@ dataGG = data.frame(PC1 = PCA$x[,1], PC2 = PCA$x[,2],
 
 pl <- (ggplot(dataGG, aes(x = PC1, 
                  y = PC2, color =  genes))
-      + geom_text(aes(label = genes), size = I(4))
+      + geom_text(aes(label = genes), size = I(2))
       + coord_fixed(ratio = (PCA$sdev^2)[2] / (PCA$sdev^2)[1])
       + ggtitle("Principal components plot")
     )
