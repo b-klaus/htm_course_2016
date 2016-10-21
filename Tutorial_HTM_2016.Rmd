@@ -41,12 +41,13 @@ devtools::install_github("CellH5/cellh5-R")
 ```
 
 ```{r required_packages_and_data, echo = TRUE, message=FALSE, cache=FALSE}
-library(rmarkdown)
-library(tidyverse)
-library(openxlsx)
-library(cellh5)
-library(psych)
-library(stringr)
+library("rmarkdown")
+library("tidyverse")
+library("openxlsx")
+library("cellh5")
+library("psych")
+library("stringr")
+library("factoextra")
 ```
 
 # About the tutorial
@@ -296,8 +297,6 @@ ggplot(loadings_gg, aes(x = class, y = loading, fill = class)) +
       geom_bar(stat = "identity") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       scale_fill_brewer(type = "qual", palette = "Set3") 
-      # geom_hline(aes(yintercept = 0.25, color = I("grey80"))) +
-      # geom_hline(aes(yintercept = -0.25, color = I("coral3")))
 
 ```
 
@@ -313,6 +312,30 @@ wells with many cells in the interphase phase. (c.f. Figure 1 of @Neumann_2010).
 The second principal component seems to separate wells that contain mainly
 cells in ana--/metaphase from wells that predominantly contains cells with
 strange shape phenotypes.
+
+## Correlation circles and PCs for hit calling
+
+The loadings are closely related (up to a scaling factor) 
+to the correlation of the original variables with the computed principal components.
+We can investigate this relationship by plotting the correlations of the original
+variables with the components in a circle. Arrows that are orthogonal to one of
+the axis.
+
+```{r co_circle, dependson="var_imp"}
+fviz_pca_var(PCA, col.circle="black",
+             title = "Correlation Circle for the PCA") +
+              coord_equal() 
+```
+We see that "apo", "artefact", "map" and "meta" are highly positively correlated 
+with  PC1, while "inter" is strongly negatively correlated with PC1, confirming 
+that PC1 identifies wells were there is a large proportion of cells which are 
+stuck in mitosis or undergoing apoptosis.
+
+PC2, is positively correlated the strange phenotypes. Thus, we could potentially
+use the first and second PC to call hits. For example, PLK1, which is very far
+from the controls in PC1 coordinates is known to be important during the M--phase
+of the cell cycle. Thus, if this gene is inhibited, the mitosis does not work 
+properly any more and the cells are stuck in the cell cycle or undergo  apoptosis. 
 
 # Plate heatmap of apoptosis proportions
 
