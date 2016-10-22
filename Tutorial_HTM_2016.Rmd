@@ -76,7 +76,7 @@ head(plate_map)
 # Raw data import
 
 We will now import the raw data. This data is stored in a variant of the [HDF5 format](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) called
-"[CellH5](http://www.cellh5.org/)",
+[CellH5](http://www.cellh5.org/),
 which defines a more restricted sub-format designed specifically to store data
 from high content screens. More information can be found in the paper by 
 @Sommer_2013.
@@ -132,7 +132,7 @@ well. Class in combination with well serves as our "key" here, and the class--co
 is the associated value.
 
 We now want to join the annotation to this data table in the long format. Before
-we can do this however, we need to solve a subtle problem: Our well identifiers
+we can do this, however, we need to solve a subtle problem: Our well identifiers
 in the imported data are different from the identifiers in the annotation table
 so we cannot easily join the two tables together. 
 
@@ -264,7 +264,7 @@ pl <- (ggplot(dataGG, aes(x = PC1, y = PC2, color =  genes))
 pl
 ```
 
-We can see that the control wells cluster together as well as . Note that it is easy to turn
+We can see, for example, that the control wells cluster together. Note that it is easy to turn
 this plot into an interactive version using `ggplotly` from the `r CRANpkg("plotly")`.
 
 
@@ -291,14 +291,14 @@ ggplot(loadings_gg, aes(x = class, y = loading, fill = class)) +
 
 ```
 
-We can see that e.g. the "inter" and the "map /prometa" classes as well as the "apo"
+We can see that e.g. the "inter" and the "map/prometa" classes as well as the "apo"
 class are important for PC1. The map and prometa classes combined
-define cells that are in mitotic delay / arrest, while the interphase class defines
+define cells that are in mitotic delay/arrest, while the interphase class defines
 a control category.
 
 So a possible explanation for PC1 would be that it separates
 wells with cells in mitotic arrest/delay (or apoptotic cells) from control 
-wells with many cells in the interphase phase. (c.f. Figure 1 of @Neumann_2010).
+wells with many cells in the interphase phase (c.f. Figure 1 of @Neumann_2010).
 
 The second principal component seems to separate wells that contain mainly
 cells in ana--/metaphase from wells that predominantly contains cells with
@@ -309,8 +309,7 @@ strange shape phenotypes.
 The loadings are closely related (up to a scaling factor) 
 to the correlation of the original variables with the computed principal components.
 We can investigate this relationship by plotting the correlations of the original
-variables with the components in a circle. Arrows that are orthogonal to one of
-the axis.
+variables with the components in a circle. 
 
 ```{r co_circle, dependson="var_imp"}
 fviz_pca_var(PCA, col.circle="black", title="Correlation Circle for the PCA") + coord_equal() 
@@ -320,7 +319,7 @@ with  PC1, while "inter" is strongly negatively correlated with PC1, confirming
 that PC1 identifies wells were there is a large proportion of cells which are 
 stuck in mitosis or undergoing apoptosis.
 
-PC2, is positively correlated the strange phenotypes. Thus, we could potentially
+PC2 is positively correlated with the strange phenotypes. Thus, we could potentially
 use the first and second PC to call hits. For example, PLK1, which is very far
 from the controls in PC1 coordinates is known to be important during the M--phase
 of the cell cycle. Thus, if this gene is inhibited, the mitosis does not work 
@@ -386,16 +385,16 @@ contains all values that measure the same underlying attribute
 contains all values measured on the same unit (like a person, or a day, 
 or a race) across attributes.
 
-Now, a tidy data frame now organizes the data in such a way that
+Now, a tidy data frame organizes the data in such a way that
 each observation corresponds to an single line in the data set. This representation
-is often referred to as a "long" data tables.
+is often referred to as a "long" data table.
 
 In general, a long data table is  the most appropriate format for 
 downstream analysis, although a wide representation is better for viewing 
 the data. For a thorough discussion of this topic see the paper by
 Hadley @greycite53870.
 
-In any case, we often need to move between the different shapes. The 
+In any case, we often need to move between these different shapes. The 
 `r CRANpkg("tidyr")` has two main functions that allows us to go back and forth:
 
 * `gather()` takes multiple columns, and gathers them 
@@ -413,9 +412,9 @@ data frame that contains one line per group.
 ## The chaining operator
 
 For this, we use the chaining (or piping) operator `%>%`. 
-$x \% \textgreater \% f(y) $ is simply $f(x, y)$, so one can use
+`x %>% f(y)` is simply `f(x, y)`, so one can use
 it to rewrite multiple operations in such a way that they can be read
-from you can read from left--to--right,
+from left--to--right, or
 top--to--bottom. A simple example will make that clear: We create 
 two vectors and calculate Euclidean distance between them. Instead of
 the usual way:
@@ -539,7 +538,7 @@ to the line is minimized, and the variance of the orthogonal projections
 of the data points along the line is maximized.
 
 Spreading points out to maximize the variance of the projected points will show
-more 'information'. 
+more "information". 
 
 For computing multiple axes, PCA finds the axis showing the largest variability,
 removing the variability in that direction and then iterating to find 
