@@ -93,7 +93,9 @@ path <- file.path(switch(.Platform$OS.type, unix = "/g", windows = "Z:"),
                   "embo2016/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
+
 predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary", as = "name")
+head(predictions)
 ```
 
 

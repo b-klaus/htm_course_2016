@@ -133,7 +133,10 @@ rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
                   <span class="st">&quot;embo2016/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5&quot;</span>)
 c5f &lt;-<span class="st"> </span><span class="kw">CellH5</span>(path)
 c5_pos &lt;-<span class="st"> </span><span class="kw">C5Positions</span>(c5f, <span class="kw">C5Plates</span>(c5f))
-predictions &lt;-<span class="st"> </span><span class="kw">C5Predictions</span>(c5f, c5_pos[[<span class="dv">1</span>]], <span class="dt">mask =</span> <span class="st">&quot;primary__primary&quot;</span>, <span class="dt">as =</span> <span class="st">&quot;name&quot;</span>)</code></pre>
+
+predictions &lt;-<span class="st"> </span><span class="kw">C5Predictions</span>(c5f, c5_pos[[<span class="dv">1</span>]], <span class="dt">mask =</span> <span class="st">&quot;primary__primary&quot;</span>, <span class="dt">as =</span> <span class="st">&quot;name&quot;</span>)
+<span class="kw">head</span>(predictions)</code></pre>
+<pre><code>   [1] &quot;inter&quot;   &quot;inter&quot;   &quot;inter&quot;   &quot;prometa&quot; &quot;inter&quot;   &quot;inter&quot;</code></pre>
 </div>
 <div id="tabulating-the-raw-data" class="section level1">
 <h1><span class="header-section-number">5</span> Tabulating the raw data</h1>
