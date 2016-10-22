@@ -69,21 +69,21 @@ document.addEventListener("DOMContentLoaded", function() {
 <h1>Contents</h1>
 <div id="TOC">
 <ul>
-<li><a href="#required-packages-and-other-preparations"><span class="toc-section-number">1</span> Required packages and other preparations</a></li>
+<li><a href="#required-packages"><span class="toc-section-number">1</span> Required packages</a></li>
 <li><a href="#about-the-tutorial"><span class="toc-section-number">2</span> About the tutorial</a></li>
 <li><a href="#annotation-import"><span class="toc-section-number">3</span> Annotation import</a></li>
-<li><a href="#importing-the-raw-data"><span class="toc-section-number">4</span> Importing the raw data</a></li>
-<li><a href="#tabulate-the-raw-data"><span class="toc-section-number">5</span> Tabulate the raw data</a></li>
+<li><a href="#raw-data-import"><span class="toc-section-number">4</span> Raw data import</a></li>
+<li><a href="#tabulating-the-raw-data"><span class="toc-section-number">5</span> Tabulating the raw data</a></li>
 <li><a href="#reshaping-the-screen-data-and-joining-the-plate-annotation"><span class="toc-section-number">6</span> Reshaping the screen data and joining the plate annotation</a></li>
-<li><a href="#using-ggplot-to-create-a-pca-plot-for-the-data"><span class="toc-section-number">7</span> Using ggplot to create a PCA plot for the data</a><ul>
+<li><a href="#using-ggplot2-to-create-a-pca-plot-for-the-data"><span class="toc-section-number">7</span> Using ggplot2 to create a PCA plot for the data</a><ul>
 <li><a href="#grouping-summarizing-and-data-transformation"><span class="toc-section-number">7.1</span> Grouping, summarizing and data transformation</a></li>
-<li><a href="#creating-the-pca-plot-using-ggplot2"><span class="toc-section-number">7.2</span> creating the PCA plot using ggplot2</a></li>
+<li><a href="#creating-the-pca-plot"><span class="toc-section-number">7.2</span> Creating the PCA plot</a></li>
 <li><a href="#variable-importance-for-the-principal-components"><span class="toc-section-number">7.3</span> Variable importance for the principal components</a></li>
 <li><a href="#correlation-circles-and-pcs-for-hit-calling"><span class="toc-section-number">7.4</span> Correlation circles and PCs for hit calling</a></li>
 </ul></li>
 <li><a href="#plate-heatmap-of-apoptosis-proportions"><span class="toc-section-number">8</span> Plate heatmap of apoptosis proportions</a></li>
 <li><a href="#background-information"><span class="toc-section-number">9</span> Background information</a><ul>
-<li><a href="#long-and-wide-data-tables-tidy-data-splitapplycombine"><span class="toc-section-number">9.1</span> Long and wide data tables, tidy data, split–apply–combine</a></li>
+<li><a href="#long-and-wide-data-tables-tidy-data-split-apply-combine"><span class="toc-section-number">9.1</span> Long and wide data tables, tidy data, split-apply-combine</a></li>
 <li><a href="#the-chaining-operator"><span class="toc-section-number">9.2</span> The chaining operator</a></li>
 <li><a href="#plotting-in-r-with-ggplot2"><span class="toc-section-number">9.3</span> Plotting in R with ggplot2</a></li>
 <li><a href="#principal-component-analysis-pca-to-for-data-visualization"><span class="toc-section-number">9.4</span> Principal component analysis (PCA) to for data visualization</a></li>
@@ -98,8 +98,8 @@ graphics.off();rm(list=ls());rmarkdown::render('Tutorial_HTM_2016.Rmd');knitr::p
 pdf document
 rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
 -->
-<div id="required-packages-and-other-preparations" class="section level1">
-<h1><span class="header-section-number">1</span> Required packages and other preparations</h1>
+<div id="required-packages" class="section level1">
+<h1><span class="header-section-number">1</span> Required packages</h1>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;rmarkdown&quot;</span>)
 <span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
 <span class="kw">library</span>(<span class="st">&quot;openxlsx&quot;</span>)
@@ -125,8 +125,8 @@ rmarkdown::render('Tutorial_HTM_2016.Rmd', BiocStyle::pdf_document())
    5   A05_01  A05    1   A      5    s4445        ECT2 target
    6   A06_01  A06    1   A      6    empty        &lt;NA&gt;    neg</code></pre>
 </div>
-<div id="importing-the-raw-data" class="section level1">
-<h1><span class="header-section-number">4</span> Importing the raw data</h1>
+<div id="raw-data-import" class="section level1">
+<h1><span class="header-section-number">4</span> Raw data import</h1>
 <p>We will now import the raw data. This data is stored in a variant of the <a href="https://en.wikipedia.org/wiki/Hierarchical_Data_Format">HDF5 format</a> called “<a href="http://www.cellh5.org/">CellH5</a>”, which defines a more restricted sub-format designed specifically to store data from high content screens. More information can be found in the paper by <span class="citation">Sommer et al. (2013)</span>.</p>
 <p>In the code below, we use the <a href="https://github.com/CellH5/cellh5-R">cellh5</a> R–package to import the data. The file <code>_all_positions.ch5</code> contains links to the other <code>ch5</code> files that contain the full data of the plate. We are only interested in the predictions produced by the machine learning algorithm, so we only extract this part of the file.</p>
 <pre class="sourceCode r"><code class="sourceCode r">path &lt;-<span class="st"> </span><span class="kw">file.path</span>(switch(.Platform$OS.type, <span class="dt">unix =</span> <span class="st">&quot;/g&quot;</span>, <span class="dt">windows =</span> <span class="st">&quot;Z:&quot;</span>),
@@ -135,8 +135,8 @@ c5f &lt;-<span class="st"> </span><span class="kw">CellH5</span>(path)
 c5_pos &lt;-<span class="st"> </span><span class="kw">C5Positions</span>(c5f, <span class="kw">C5Plates</span>(c5f))
 predictions &lt;-<span class="st"> </span><span class="kw">C5Predictions</span>(c5f, c5_pos[[<span class="dv">1</span>]], <span class="dt">mask =</span> <span class="st">&quot;primary__primary&quot;</span>, <span class="dt">as =</span> <span class="st">&quot;name&quot;</span>)</code></pre>
 </div>
-<div id="tabulate-the-raw-data" class="section level1">
-<h1><span class="header-section-number">5</span> Tabulate the raw data</h1>
+<div id="tabulating-the-raw-data" class="section level1">
+<h1><span class="header-section-number">5</span> Tabulating the raw data</h1>
 <p>We now tabulate the raw data: we compute how many cells are assigned to each class for each well. The result is a data matrix, which contains the wells of the screen plate in the columns and the counts for the respective classes in the rows.</p>
 <p>This is a typical example of a “wide” data table, where the variables contained in the data set spread across multiple columns (here we only show the first six ones).</p>
 <pre class="sourceCode r"><code class="sourceCode r">raw_data &lt;-<span class="st"> </span><span class="kw">sapply</span>(c5_pos,
@@ -191,8 +191,8 @@ input_data &lt;-<span class="st"> </span><span class="kw">left_join</span>(tidy_
    213  artefact B10_01   352  B10    1   B     10   s17612       AURKB target
    838 polylobed G12_01    75  G12    1   G     12    s2748       CDC20 target</code></pre>
 </div>
-<div id="using-ggplot-to-create-a-pca-plot-for-the-data" class="section level1">
-<h1><span class="header-section-number">7</span> Using ggplot to create a PCA plot for the data</h1>
+<div id="using-ggplot2-to-create-a-pca-plot-for-the-data" class="section level1">
+<h1><span class="header-section-number">7</span> Using ggplot2 to create a PCA plot for the data</h1>
 <p>The data we have lives in a ten dimensional space, as every well contains cells classified into one of ten different classes. In order to produce a succinct overview of the data, one tries to reduce the dimensionality of the data. A popular way to do this is to compute new, artificial, variables that are a weighted sum of the original variables. The weights are obtained in such a way that the variables are independent of each other and retain as much of the original variability (a proxy of information content) as possible. These new variables are called “principal components” (PCs) of the data.</p>
 <p>Before we can compute the PCs, we have to make sure that the variables that we have obtained for every single well are normalized. As our data consists of the number of cells in each phenotypic category, a straightforward normalization consists of transforming the counts into percentages by dividing the data for each well by its total number of cells.</p>
 <div id="grouping-summarizing-and-data-transformation" class="section level2">
@@ -236,8 +236,8 @@ input_data &lt;-<span class="st"> </span><span class="kw">left_join</span>(tidy_
    6    41138 0.07074  -2.575</code></pre>
 <p>Here, we use the chaining/piping operator <code>%&gt;%</code> to “pipe” the result of a computation into the next. This leads to more digestible code compared to e.g. loops.</p>
 </div>
-<div id="creating-the-pca-plot-using-ggplot2" class="section level2">
-<h2><span class="header-section-number">7.2</span> creating the PCA plot using ggplot2</h2>
+<div id="creating-the-pca-plot" class="section level2">
+<h2><span class="header-section-number">7.2</span> Creating the PCA plot</h2>
 <p>We are now ready to create the PCA plot. For this, we first need to turn the input data into a wide data frame again by spreading the z-scores across columns.</p>
 <p>We can then use the function <code>prcomp()</code> to compute the actual principal components. We also create a vector genes, giving us the gene each of our siRNAs is targeting.</p>
 <p>We then create a ggplot object by mapping the first principal component to the x– and the second one to the y–axis. We use the gene names as plotting symbols and color the names according to to the gene name (As we have multiple empty wells as well as multiple siRNAs targeting the same gene).</p>
@@ -327,8 +327,8 @@ heatmap</code></pre>
 <div id="background-information" class="section level1">
 <h1><span class="header-section-number">9</span> Background information</h1>
 <p>The following sections contain additional background information on the techniques used in this tutorial.</p>
-<div id="long-and-wide-data-tables-tidy-data-splitapplycombine" class="section level2">
-<h2><span class="header-section-number">9.1</span> Long and wide data tables, tidy data, split–apply–combine</h2>
+<div id="long-and-wide-data-tables-tidy-data-split-apply-combine" class="section level2">
+<h2><span class="header-section-number">9.1</span> Long and wide data tables, tidy data, split-apply-combine</h2>
 <p>In a nutshell, a dataset is a collection of values, usually either numbers (if quantitative) or strings (if qualitative). Values are organized in two ways: Every value belongs to a variable and an observation.</p>
 <p>A variable contains all values that measure the same underlying attribute (like height, temperature, duration) across units. An observation contains all values measured on the same unit (like a person, or a day, or a race) across attributes.</p>
 <p>Now, a tidy data frame now organizes the data in such a way that each observation corresponds to an single line in the data set. This representation is often referred to as a “long” data tables.</p>

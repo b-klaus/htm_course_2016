@@ -33,7 +33,7 @@ set.seed(2016)
 
 
 
-# Required packages and other preparations
+# Required packages
 
 ```{r get-patched-cellh5, eval=FALSE, include=FALSE}
 ## this code chunk is disabled from running and displaying
@@ -73,7 +73,7 @@ head(plate_map)
 ```
 
 
-# Importing the raw data
+# Raw data import
 
 We will now import the raw data. This data is stored in a variant of the [HDF5 format](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) called
 "[CellH5](http://www.cellh5.org/)",
@@ -97,7 +97,7 @@ predictions <- C5Predictions(c5f, c5_pos[[1]], mask = "primary__primary", as = "
 ```
 
 
-# Tabulate the raw data
+# Tabulating the raw data
 
 We now tabulate the raw data: we compute how many cells are assigned to each 
 class for each well. The result is a data matrix, which contains the wells of
@@ -116,8 +116,6 @@ raw_data <- sapply(c5_pos,
 
 raw_data[, 1:6]
 ```
-
-
 
 
 # Reshaping the screen data and joining the plate annotation
@@ -162,7 +160,7 @@ sample_n(input_data, 6)
 ```
 
 
-# Using ggplot to create a PCA plot for the data
+# Using ggplot2 to create a PCA plot for the data
 
 The data we have lives in a ten dimensional space, as every well contains
 cells classified into one of ten different classes. In order to produce a succinct
@@ -218,7 +216,7 @@ head(data_for_PCA)
 Here, we use the chaining/piping operator `%>%` to "pipe" the result of a 
 computation into the next. This leads to more digestible code compared to e.g. loops. 
 
-## creating the PCA plot using ggplot2
+## Creating the PCA plot
 
 We are now ready to create the PCA plot. For this, we first need to turn
 the input data into a wide data frame again by spreading the z-scores across
@@ -376,7 +374,7 @@ heatmap
 The following sections contain additional background information on the
 techniques used in this tutorial.
 
-## Long and wide data tables, tidy data, split--apply--combine
+## Long and wide data tables, tidy data, split-apply-combine
 
 In a nutshell, a  dataset is a collection of values, usually either numbers
 (if quantitative) or strings (if qualitative). Values are organized in two ways:
