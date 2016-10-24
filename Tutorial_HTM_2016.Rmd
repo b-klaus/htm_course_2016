@@ -89,8 +89,8 @@ by the machine learning algorithm, so we only extract this part of the file.
 
 
 ```{r readCellH5, dependson="plate_map"}
-path <- file.path(switch(.Platform$OS.type, unix = "/g", windows = "Z:"),
-                  "embo2016/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5")
+path <- file.path(switch(.Platform$OS.type, unix = "/g/embo2016", windows = "Z:"),
+                  "/htm2016/P12_Visual_Exploration/hdf5/_all_positions.ch5")
 c5f <- CellH5(path)
 c5_pos <- C5Positions(c5f, C5Plates(c5f))
 
@@ -268,6 +268,15 @@ pl
 
 We can see, for example, that the control wells cluster together. Note that it is easy to turn
 this plot into an interactive version using `ggplotly` from the `r CRANpkg("plotly")`.
+
+```{r plotly, eval=FALSE, fig.width= 4.5, dependson="PCA"}
+if(!("plotly" %in% installed.packages()[,1])){
+  install.packages("plotly")
+}
+
+library(plotly)
+ggplotly(pl)
+```
 
 
 ## Variable importance for the principal components
